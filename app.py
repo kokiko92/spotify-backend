@@ -27,8 +27,10 @@ def index():
 
 @app.route('/callback')
 def callback():
-    # Spotify renvoie un code d'autorisation que nous utilisons pour obtenir le token d'accès
     code = request.args.get('code')
+    if not code:
+        return "❌ Code manquant dans la requête", 400
+
     payload = {
         'grant_type': 'authorization_code',
         'code': code,
@@ -36,12 +38,31 @@ def callback():
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET
     }
-    res = requests.post(SPOTIFY_TOKEN_URL, data=payload)
-    res_data = res.json()
-    # Enregistre le token d'accès dans la session
-    session['access_token'] = res_data['access_token']
-    session['refresh_token'] = res_data.get('refresh_token')
-    return redirect('/')
+
+    try:
+        res = requests.post(SPOTIFY_TOKEN_URL, data=payload)
+        res.raise_for_status()  # Cela lève une exception si la réponse n'est pas un code 2xx
+        res_data = res.json()
+
+        # Log détaillé pour voir la réponse de Spotify
+        app.logger.debug(f"Réponse de Spotify: {res_data}")
+
+        # Vérifie si l'access_token est présent dans la réponse
+        if 'access_token' not in res_data:
+            return f"❌ Token d'accès manquant. Réponse complète: {res_data}", 500
+
+        # Si la réponse est correcte, enregistre le token d'accès
+        session['access_token'] = res_data['access_token']
+        session['refresh_token'] = res_data.get('refresh_token')
+
+        return redirect('/')
+    except requests.exceptions.HTTPError as e:
+        return f"❌ Erreur HTTP lors de la demande de token: {e.response.status_code} - {e.response.text}", 500
+    except requests.exceptions.RequestException as e:
+        return f"❌ Erreur lors de la communication avec Spotify: {str(e)}", 500
+    except Exception as e:
+        return f"❌ Une erreur inattendue s'est produite: {str(e)}", 500
+
 
 @app.route('/add_song', methods=['POST'])
 def add_song():
