@@ -70,4 +70,5 @@ def add_song():
         return "❌ Morceau introuvable !", 404
 
 if __name__ == '__main__':
-    app.run()
+    port = os.getenv("PORT", 5000)  # Utilise le port fourni par Render ou 5000 par défaut
+    app.run(host="0.0.0.0", port=port)
