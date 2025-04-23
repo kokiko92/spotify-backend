@@ -2,10 +2,11 @@ from flask import Flask, request, redirect, session, render_template
 import requests
 import urllib.parse
 import os
-from flask_cors import CORS
-CORS(app, resources={r"/*": {"origins": "*"}})
+from flask_cors import CORS  # Assure-toi que cette ligne est présente
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Active CORS pour toutes les origines
+
 app.secret_key = 'secret_for_session'
 
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
@@ -20,9 +21,7 @@ SCOPE = 'playlist-modify-public playlist-modify-private'
 
 @app.route('/')
 def index():
-    # Vérifie si l'utilisateur est déjà authentifié avec Spotify (token d'accès dans la session)
     if 'access_token' not in session:
-        # Si non, redirige l'utilisateur vers la page d'authentification Spotify
         auth_url = f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}&scope={urllib.parse.quote(SCOPE)}&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
         return redirect(auth_url)
     return "Le backend est prêt. Tu peux accéder au site Netlify."
@@ -43,17 +42,12 @@ def callback():
 
     try:
         res = requests.post(SPOTIFY_TOKEN_URL, data=payload)
-        res.raise_for_status()  # Cela lève une exception si la réponse n'est pas un code 2xx
+        res.raise_for_status()
         res_data = res.json()
 
-        # Log détaillé pour voir la réponse de Spotify
-        app.logger.debug(f"Réponse de Spotify: {res_data}")
-
-        # Vérifie si l'access_token est présent dans la réponse
         if 'access_token' not in res_data:
             return f"❌ Token d'accès manquant. Réponse complète: {res_data}", 500
 
-        # Si la réponse est correcte, enregistre le token d'accès
         session['access_token'] = res_data['access_token']
         session['refresh_token'] = res_data.get('refresh_token')
 
@@ -65,16 +59,12 @@ def callback():
     except Exception as e:
         return f"❌ Une erreur inattendue s'est produite: {str(e)}", 500
 
-
 @app.route('/add_song', methods=['POST'])
 def add_song():
-    # Vérifie si l'utilisateur est authentifié (token d'accès présent)
     token = session.get('access_token')
     if not token:
-        # Si aucun token, redirige l'utilisateur vers la page d'authentification
         return redirect('/')
 
-    # Récupère le titre + artiste de la chanson envoyée
     track = request.form.get('track')
     headers = {'Authorization': f'Bearer {token}'}
     search_url = f"{SPOTIFY_API_BASE_URL}/search"
@@ -93,5 +83,5 @@ def add_song():
         return "❌ Morceau introuvable !", 404
 
 if __name__ == '__main__':
-    port = os.getenv("PORT", 5000)  # Utilise le port fourni par Render ou 5000 par défaut
+    port = os.getenv("PORT", 5000)
     app.run(host="0.0.0.0", port=port)
