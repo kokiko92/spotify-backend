@@ -8,7 +8,7 @@ app.secret_key = 'secret_for_session'
 
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
+REDIRECT_URI = "https://spotify-backend-jxfs.onrender.com/callback"
 PLAYLIST_ID = os.getenv("SPOTIFY_PLAYLIST_ID")
 
 SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize'
