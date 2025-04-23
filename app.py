@@ -2,6 +2,8 @@ from flask import Flask, request, redirect, session, render_template
 import requests
 import urllib.parse
 import os
+from flask_cors import CORS
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 app = Flask(__name__)
 app.secret_key = 'secret_for_session'
