@@ -6,11 +6,13 @@ import os
 app = Flask(__name__)
 app.secret_key = 'secret_for_session'
 
+# Remplis avec tes clés Spotify
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 PLAYLIST_ID = os.getenv("SPOTIFY_PLAYLIST_ID")
 
+# URLs de l'API Spotify
 SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize'
 SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
 SPOTIFY_API_BASE_URL = 'https://api.spotify.com/v1'
