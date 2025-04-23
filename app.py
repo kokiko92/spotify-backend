@@ -8,7 +8,7 @@ app.secret_key = 'secret_for_session'
 
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-REDIRECT_URI = "https://spotify-backend-jxfs.onrender.com/callback"
+REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 PLAYLIST_ID = os.getenv("SPOTIFY_PLAYLIST_ID")
 
 SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -19,7 +19,7 @@ SCOPE = 'playlist-modify-public playlist-modify-private'
 @app.route('/')
 def index():
     if 'access_token' not in session:
-        auth_url = f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}&scope={urllib.parse.quote(SCOPE)}&redirect_uri={urllib.parse.quote(REDIRECT_URI, safe='')}"
+        auth_url = f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}&scope={urllib.parse.quote(SCOPE)}&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
         return redirect(auth_url)
     return "Le backend est prêt. Tu peux accéder au site Netlify."
 
@@ -63,4 +63,4 @@ def add_song():
         return "❌ Morceau introuvable !", 404
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=True)
