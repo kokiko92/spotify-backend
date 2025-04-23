@@ -19,7 +19,7 @@ SCOPE = 'playlist-modify-public playlist-modify-private'
 @app.route('/')
 def index():
     if 'access_token' not in session:
-        auth_url = f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}&scope={urllib.parse.quote(SCOPE)}&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
+        auth_url = f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}&scope={urllib.parse.quote(SCOPE)}&redirect_uri={urllib.parse.quote(REDIRECT_URI, safe='')}"
         return redirect(auth_url)
     return "Le backend est prêt. Tu peux accéder au site Netlify."
 
